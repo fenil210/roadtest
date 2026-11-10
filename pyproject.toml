@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "roadtest"
 version = "0.1.0"
-description = "Road-test your AI agent before it ships: scenario-based evals for any agent, written by your coding agent."
+description = "Test your AI agent before every release. Your coding assistant writes the test scenarios; roadtest runs them, grades every reply and fails CI when something breaks."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]

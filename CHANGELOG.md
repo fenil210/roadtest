@@ -9,5 +9,5 @@ First release.
 - Code checks, rubric lines graded by a judge model, and custom Python checks.
 - `gate` and `watch` tiers, repeated runs, named targets.
 - Terminal, Markdown and HTML reports; run comparison and a committed baseline.
-- A skill for coding agents, installed by `roadtest init`, by `npx skills add`, or as a Claude Code plugin.
+- A skill for coding assistants, installed by `roadtest init`, by `npx skills add`, or as a Claude Code plugin.
 - `roadtest demo`: a full run against a bundled agent with no setup.

@@ -1,6 +1,6 @@
 {
   "name": "roadtest",
-  "description": "roadtest: scenario-based evals for any AI agent, set up and written by your coding agent.",
+  "description": "roadtest: test your AI agent before every release. Your coding assistant sets it up and writes the test scenarios.",
   "owner": { "name": "Fenil Ramoliya" },
   "plugins": [
     {

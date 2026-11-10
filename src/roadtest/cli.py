@@ -38,7 +38,7 @@ COMMANDS = (
     ("report", "Show a past run again"),
     ("compare", "Show what changed between two runs"),
     ("baseline", "Pin a run as the baseline to compare against"),
-    ("guide", "Print a guide (for you or your coding agent)"),
+    ("guide", "Print a guide (for you or your coding assistant)"),
 )
 
 
@@ -73,7 +73,7 @@ def _init(arguments: argparse.Namespace) -> int:
         console.print(f"  [{style}]{action:<8}[/] {escape(path)}" + (f"  [dim]{escape(note)}[/]" if note else ""))
     console.print()
     console.print("  [bold]Next[/]")
-    console.print('  1. Ask your coding agent: [cyan]"Set up roadtest for my agent, then write 20 scenarios."[/]')
+    console.print('  1. Ask your coding assistant: [cyan]"Set up roadtest for my agent, then write 20 scenarios."[/]')
     console.print(f"     [dim]or edit {arguments.dir}/roadtest.yaml yourself (`roadtest guide setup`)[/]")
     console.print("  2. [cyan]roadtest doctor[/]   [dim]check the connection[/]")
     console.print("  3. [cyan]roadtest run[/]      [dim]run the scenarios[/]")
@@ -401,7 +401,7 @@ def _print_problems(problems: list[str]) -> None:
 
 def _welcome() -> None:
     console.print()
-    console.print(f"  [bold]roadtest[/] {__version__}  [dim]road-test your AI agent before it ships[/]")
+    console.print(f"  [bold]roadtest[/] {__version__}  [dim]test your AI agent before every release[/]")
     console.print()
     for name, description in COMMANDS:
         console.print(f"  [cyan]roadtest {name:<9}[/] {description}")
@@ -451,7 +451,7 @@ def _count(text: str) -> int:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="roadtest",
-        description="Road-test your AI agent before it ships.",
+        description="Test your AI agent before every release.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=f"roadtest {__version__}")
@@ -472,7 +472,7 @@ def _parser() -> argparse.ArgumentParser:
         "--skills",
         choices=("auto", "all", "agents", "claude", "none"),
         default="auto",
-        help="which coding agents get the roadtest skill (default: auto)",
+        help="which coding assistants get the roadtest skill (default: auto)",
     )
     init.add_argument("--force", action="store_true", help="overwrite existing config and starter scenarios")
 

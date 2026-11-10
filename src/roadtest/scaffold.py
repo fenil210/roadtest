@@ -1,4 +1,4 @@
-"""`roadtest init`: the files a project starts with, and the skill that teaches coding agents roadtest."""
+"""`roadtest init`: the files a project starts with, and the skill that teaches coding assistants roadtest."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ models:
 
 EXAMPLE_SCENARIOS = """\
 # Two starter scenarios that suit most conversational agents. Replace them with your own:
-# ask your coding agent to "write roadtest scenarios for this agent", or see `roadtest guide scenarios`.
+# ask your coding assistant to "write roadtest scenarios for this agent", or see `roadtest guide scenarios`.
 
 scenarios:
   - id: says-what-it-can-do

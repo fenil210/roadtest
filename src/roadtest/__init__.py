@@ -1,4 +1,4 @@
-"""roadtest: road-test your AI agent before it ships."""
+"""roadtest: test your AI agent before every release."""
 
 __version__ = "0.1.0"
 

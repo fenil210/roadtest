@@ -5,9 +5,9 @@
 <h1 align="center">roadtest</h1>
 
 <p align="center">
-  <b>Road-test your AI agent before it ships.</b><br>
-  Open-source evals for any agent. Your coding agent writes the scenarios.<br>
-  roadtest runs them, grades them, and stops a bad release.
+  <b>Test your AI agent before every release.</b><br>
+  Your coding assistant connects roadtest to your agent and writes the test scenarios.<br>
+  roadtest runs them, grades every reply, and fails CI when something breaks.
 </p>
 
 <p align="center">
@@ -22,8 +22,7 @@
 </p>
 
 <p align="center">
-  <a href="docs/assets/launch.mp4"><img src="docs/assets/launch-poster.png" width="420" alt="Watch the launch video"></a><br>
-  <sub><a href="docs/assets/launch.mp4">Watch the 55-second tour</a> (sound on)</sub>
+  <a href="docs/assets/launch.mp4"><img src="docs/assets/launch-poster.png" width="420" alt="roadtest launch video"></a>
 </p>
 
 ## Why roadtest
@@ -31,13 +30,13 @@
 - **It works with the agent you already have.** Point it at an HTTP endpoint, a Python function or
   a command. There is no SDK to adopt, no code to wrap and no tracing to install. LangGraph, CrewAI,
   the OpenAI Agents SDK, your own loop: roadtest tests it from the outside, the way your users do.
-- **Your coding agent does the setup.** `roadtest init` installs a skill that teaches Claude Code,
-  Codex, Cursor and Copilot how to connect your agent and write scenarios for it. You say
-  "write 20 scenarios" and review a YAML file.
+- **Your coding assistant does the setup.** `roadtest init` adds a skill that teaches Claude Code,
+  Codex, Cursor and Copilot how to connect your agent and write scenarios for it. You ask for
+  20 scenarios and review a YAML file.
 - **It answers one question: can this ship?** Scenarios are either `gate` (must pass) or `watch`
   (tracked). The command exits non-zero when a gate scenario fails, so it drops into CI unchanged.
 
-## Try it in 30 seconds
+## Try it
 
 ```bash
 pip install roadtest
@@ -47,7 +46,7 @@ roadtest demo
 The demo runs twelve scenarios against a small bundled agent that has two bugs planted in it, and
 shows you roadtest catching them. It needs no setup and no API key.
 
-## Use it on your agent
+## Set it up for your agent
 
 ### 1. Add roadtest to your project
 
@@ -56,18 +55,18 @@ pip install roadtest
 roadtest init
 ```
 
-This creates `evals/roadtest.yaml`, a starter scenario file, and the roadtest skill for your coding
-agent.
+This creates `evals/roadtest.yaml`, a starter scenario file, and the skill that teaches your coding
+assistant how to use roadtest.
 
-### 2. Let your coding agent set it up
+### 2. Ask your coding assistant to set it up
 
 Open Claude Code, Codex, Cursor or Copilot in the project and say:
 
 > Set up roadtest for my agent, then write 20 scenarios and run them.
 
-The agent reads your code, fills in `evals/roadtest.yaml`, checks the connection with
-`roadtest doctor`, writes scenarios that cover your agent's real behaviour, runs them, and tells
-you which failures look like real bugs.
+It reads your code, fills in `evals/roadtest.yaml`, checks the connection with `roadtest doctor`,
+writes scenarios that cover what your agent actually does, runs them, and tells you which failures
+look like real bugs.
 
 Prefer to do it by hand? It is one small file. See [connecting an agent](#connecting-an-agent).
 
@@ -201,7 +200,7 @@ Sessions, streaming, server-issued conversation ids and every option are in the
 | `roadtest report` | Show a past run again, or open its HTML report |
 | `roadtest compare` | What changed between two runs: regressions, fixes, new scenarios |
 | `roadtest baseline` | Pin a run as the baseline that `compare` uses |
-| `roadtest guide` | Print a guide, for you or for your coding agent |
+| `roadtest guide` | Print a guide, for you or for your coding assistant |
 
 ## Before and after every deploy
 
@@ -222,11 +221,11 @@ roadtest compare                         # what regressed since the baseline
 The pass and fail summary lands on the GitHub job summary page automatically. Complete workflows are
 in the [CI guide](skills/roadtest/references/ci.md).
 
-## Coding agent support
+## Coding assistants
 
 `roadtest init` installs the skill into the project. You can also install it on its own.
 
-| Agent | How the skill gets there |
+| Coding assistant | How the skill gets there |
 | --- | --- |
 | Claude Code | `roadtest init` writes `.claude/skills/roadtest/`. Or as a plugin: `/plugin marketplace add fenil210/roadtest`, then `/plugin install roadtest@roadtest` |
 | Codex, Cursor, GitHub Copilot, OpenCode, Amp | `roadtest init` writes `.agents/skills/roadtest/`, which they all read |
@@ -290,7 +289,7 @@ Your agent's own cost per scenario, plus one small judge call per rubric line. C
 Sometimes, and that is information. Use `--repeat` to measure it, and move anything exact into code
 checks.
 
-**Can I use it without a coding agent?**
+**Can I use it without a coding assistant?**
 Yes. Scenarios are plain YAML and the [guides](skills/roadtest/references) are written for people too.
 
 ## Contributing
