@@ -20,10 +20,14 @@ jobs:
       - name: Check that the tag matches the package version
         run: |
           version=$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' src/roadtest/__init__.py)
-          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::The release tag is $GITHUB_REF_NAME but src/roadtest/__init__.py says $version. Set __version__ to match, push, then publish the release again."
+          tag="$GITHUB_REF_NAME"
+          tagged="${tag#[vV]}"     # v0.1.2, V0.1.2 and 0.1.2 all mean 0.1.2
+          tagged="${tagged#.}"     # and so does v.0.1.2
+          if [ "$tagged" != "$version" ]; then
+            echo "::error::The release tag $tag is for version $tagged, but the package is $version (src/roadtest/__init__.py). If this release is $version, give it the tag v$version. If it is a new version, set __version__ to $tagged, push, then publish the release."
             exit 1
           fi
+          echo "Publishing roadtest $version from tag $tag"
       - run: pip install build
       - run: python -m build
       - uses: pypa/gh-action-pypi-publish@release/v1
