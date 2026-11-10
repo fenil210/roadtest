@@ -1,6 +1,6 @@
 {
   "name": "roadtest",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Set up roadtest for the AI agent you're building: connect it, write the test scenarios, run them and explain the failures.",
   "author": { "name": "Fenil Ramoliya" },
   "homepage": "https://github.com/fenil210/roadtest",

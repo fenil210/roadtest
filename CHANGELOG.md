@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2
 
 - The package is grouped by what each part does: `adapters/` (HTTP, Python function, command),
   `models/` (the judge and the simulated user) and `reports/` (saving, comparing and showing runs).
