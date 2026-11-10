@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Clearer wording in the README, the command-line help and the files `roadtest init` writes.
+- The release workflow stops with a clear message when the release tag and the package version differ.
+
 ## 0.1.0
 
 First release.

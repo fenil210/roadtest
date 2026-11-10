@@ -401,7 +401,7 @@ def _print_problems(problems: list[str]) -> None:
 
 def _welcome() -> None:
     console.print()
-    console.print(f"  [bold]roadtest[/] {__version__}  [dim]test your AI agent before every release[/]")
+    console.print(f"  [bold]roadtest[/] {__version__}  [dim]automated tests for the AI agent you're building[/]")
     console.print()
     for name, description in COMMANDS:
         console.print(f"  [cyan]roadtest {name:<9}[/] {description}")
@@ -451,7 +451,7 @@ def _count(text: str) -> int:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="roadtest",
-        description="Test your AI agent before every release.",
+        description="Automated tests for the AI agent you're building.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument("--version", action="version", version=f"roadtest {__version__}")

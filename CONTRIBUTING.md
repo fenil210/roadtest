@@ -39,5 +39,7 @@ roadtest demo
 
 ## Releasing
 
-Bump `version` in `pyproject.toml`, `src/roadtest/__init__.py` and `.claude-plugin/plugin.json`, add a `CHANGELOG.md` entry, and
-publish a GitHub release. The `release` workflow builds and uploads to PyPI.
+Set `__version__` in `src/roadtest/__init__.py` (the package reads its version from there) and
+`version` in `.claude-plugin/plugin.json`, add a `CHANGELOG.md` entry, push, then publish a GitHub
+release tagged `v` plus that version, for example `v0.1.1`. The `release` workflow checks that the
+tag matches, builds the package and uploads it to PyPI.

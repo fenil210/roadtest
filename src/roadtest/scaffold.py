@@ -60,7 +60,7 @@ scenarios:
 GITIGNORE = "results/\n.env\n"
 
 SKILL_TARGETS = {
-    "agents": (".agents/skills", "Codex, Cursor, Copilot and other agents"),
+    "agents": (".agents/skills", "Codex, Cursor, Copilot and others"),
     "claude": (".claude/skills", "Claude Code"),
 }
 

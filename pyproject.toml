@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "roadtest"
-version = "0.1.0"
-description = "Test your AI agent before every release. Your coding assistant writes the test scenarios; roadtest runs them, grades every reply and fails CI when something breaks."
+dynamic = ["version"]
+description = "Automated tests for the AI agent you're building. Claude Code, Codex, Cursor or Copilot writes the tests; roadtest runs them and fails CI when something breaks."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -40,6 +40,9 @@ Issues = "https://github.com/fenil210/roadtest/issues"
 
 [project.scripts]
 roadtest = "roadtest.cli:main"
+
+[tool.hatch.version]
+path = "src/roadtest/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/roadtest"]

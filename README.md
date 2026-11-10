@@ -5,17 +5,21 @@
 <h1 align="center">roadtest</h1>
 
 <p align="center">
-  <b>Test your AI agent before every release.</b><br>
-  Your coding assistant connects roadtest to your agent and writes the test scenarios.<br>
-  roadtest runs them, grades every reply, and fails CI when something breaks.
+  <b>Automated tests for the AI agent you're building.</b><br>
+  Claude Code, Codex, Cursor or Copilot writes the tests. roadtest runs them in CI.
 </p>
 
 <p align="center">
-  <a href="https://pypi.org/project/roadtest/"><img src="https://img.shields.io/pypi/v/roadtest?color=34D399" alt="PyPI"></a>
-  <a href="https://pypi.org/project/roadtest/"><img src="https://img.shields.io/pypi/pyversions/roadtest" alt="Python versions"></a>
+  <a href="https://pypi.org/project/roadtest/"><img src="https://img.shields.io/pypi/v/roadtest?label=pypi&color=34D399" alt="PyPI"></a>
+  <a href="https://pypi.org/project/roadtest/"><img src="https://img.shields.io/pypi/pyversions/roadtest?label=python" alt="Python versions"></a>
   <a href="https://github.com/fenil210/roadtest/actions/workflows/ci.yml"><img src="https://github.com/fenil210/roadtest/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT licence"></a>
 </p>
+
+roadtest is for developers building AI agents: support bots, copilots inside an app, research
+assistants, anything people talk to. Every prompt, model or tool change can break an agent in ways
+you only notice when a user does. roadtest sends your agent realistic conversations, checks every
+reply and tool call, and fails the build when a change breaks something.
 
 <p align="center">
   <img src="docs/assets/demo.gif" width="820" alt="roadtest demo: twelve scenarios run against an agent, two planted bugs are caught, and the gate fails">
@@ -102,6 +106,8 @@ reasoning for every verdict:
 </p>
 
 ## What a scenario looks like
+
+A scenario is one test: what the user says, and what a good reply has to do.
 
 ```yaml
 # evals/scenarios/refunds.yaml

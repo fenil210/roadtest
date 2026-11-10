@@ -1,7 +1,7 @@
 {
   "name": "roadtest",
-  "version": "0.1.0",
-  "description": "Set up, write and triage evals for an AI agent with roadtest: connect the agent, generate scenarios, run them and explain failures.",
+  "version": "0.1.1",
+  "description": "Set up roadtest for the AI agent you're building: connect it, write the test scenarios, run them and explain the failures.",
   "author": { "name": "Fenil Ramoliya" },
   "homepage": "https://github.com/fenil210/roadtest",
   "repository": "https://github.com/fenil210/roadtest",
