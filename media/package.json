@@ -1,0 +1,9 @@
+{
+  "name": "roadtest-media",
+  "private": true,
+  "description": "Renders the README demo and the launch video from HTML scenes.",
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "^25.16.0"
+  }
+}

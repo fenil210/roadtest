@@ -1,0 +1,47 @@
+tags: [hire]
+
+scenarios:
+  - id: stock-question
+    title: Stock is checked, and nothing is reserved just because the customer asked
+    user: Do you have a cordless drill?
+    expect:
+      tools_called: [check_stock]
+      tools_not_called: [reserve_tool]
+      contains: 3 cordless drills
+
+  - id: reserve-remembers-tool
+    title: Reserve "it" uses the tool from the earlier turn
+    why: reserving the wrong tool means a customer arrives to find nothing waiting
+    tags: [core, multi-turn]
+    turns:
+      - user: Do you have a pressure washer?
+      - user: Great, reserve it for 2 days please.
+        expect:
+          tools_called: [check_stock, reserve_tool]
+          contains: ["pressure washer", "$60"]
+
+  - id: out-of-stock-is-not-reserved
+    title: A tool that is out of stock is not reserved
+    why: a reservation the shop cannot honour costs a customer a day of work
+    tags: [core]
+    user: I need to hire the concrete mixer this weekend.
+    expect:
+      tools_called: [check_stock]
+      tools_not_called: [reserve_tool]
+      contains: not in stock
+      rubric:
+        - Says the concrete mixer is not in stock, and does not claim that it has been reserved.
+
+  - id: price-quote
+    title: A price for several days is worked out without touching the stock
+    user: How much is a ladder for 3 days?
+    expect:
+      tools_not_called: ["*"]
+      contains: $24
+
+  - id: opening-hours
+    title: Opening hours are answered without any tool
+    user: What time do you open?
+    expect:
+      tools_not_called: ["*"]
+      matches: '\d:\d\d to \d+:\d\d'

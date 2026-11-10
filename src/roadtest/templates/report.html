@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>roadtest report</title>
+<link rel="icon" href="data:,">
+<script>
+// Pick the theme before first paint: a saved choice wins, otherwise follow the system.
+(function () {
+  var saved = null;
+  try { saved = localStorage.getItem("roadtest-theme"); } catch (error) { /* storage can be blocked on file:// */ }
+  var system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.dataset.theme = saved === "dark" || saved === "light" ? saved : system;
+})();
+</script>
+<style>
+:root {
+  --bg: #f6f6f3; --surface: #ffffff; --sunken: #f0f0ec; --line: #e1e0da; --control: #8b8a84;
+  --text: #1c1c1a; --muted: #5a5954; --accent: #2a57c0; --accent-soft: #e9eefb;
+  --pass: #17693c; --pass-soft: #e5f3ea; --fail: #b0261d; --fail-soft: #fbeae8;
+  --error: #855000; --error-soft: #fbf1dc; --skip: #5a5954;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #111214; --surface: #191b1e; --sunken: #212327; --line: #2d3035; --control: #70747b;
+  --text: #e8e6e1; --muted: #a5a39d; --accent: #8fb2ff; --accent-soft: #1d2942;
+  --pass: #62cf9b; --pass-soft: #12301f; --fail: #ff8f85; --fail-soft: #3b1a18;
+  --error: #edb64a; --error-soft: #35280c; --skip: #a5a39d;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 0.9375rem/1.55 var(--sans); overflow-wrap: anywhere; }
+h1, h2, h3, p, dl, dd, ol, ul, pre { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--accent); text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.mono, pre, code { font-family: var(--mono); font-size: 0.92em; }
+.muted { color: var(--muted); }
+.small { font-size: 0.8667rem; }
+.label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.defs { position: absolute; width: 0; height: 0; }
+.icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+
+.page { max-width: 1080px; margin: 0 auto; padding: 20px 24px 72px; }
+.masthead { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.brand { font-family: var(--mono); font-weight: 600; }
+.brand span { color: var(--muted); font-weight: 400; }
+.quiet { border: 1px solid var(--control); border-radius: 8px; background: var(--surface); padding: 5px 12px; font-size: 0.8667rem; transition: background-color 0.12s; }
+.quiet:hover { background: var(--sunken); }
+section { margin-top: 40px; }
+h2 { font-size: 1.0667rem; font-weight: 600; margin-bottom: 12px; }
+.card { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+
+/* Verdict: the one loud element on the page. */
+.verdict { margin-top: 0; overflow: hidden; border-radius: 12px; }
+.verdict-head { display: flex; align-items: center; gap: 18px; padding: 28px; }
+.verdict.pass .verdict-head { background: var(--pass-soft); color: var(--pass); }
+.verdict.fail .verdict-head { background: var(--fail-soft); color: var(--fail); }
+.verdict-head .icon { width: 48px; height: 48px; stroke-width: 1.4; }
+.verdict h1 { font-size: clamp(2rem, 7vw, 2.75rem); line-height: 1.1; letter-spacing: -0.02em; }
+.verdict-head p { margin-top: 6px; color: var(--text); }
+.meta { display: flex; flex-wrap: wrap; gap: 16px 40px; padding: 20px 28px; }
+.meta > div { min-width: 0; }
+.meta dt { font-size: 0.8rem; color: var(--muted); }
+
+/* Summary */
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.stat { padding: 14px 16px; }
+.stat-label { display: flex; align-items: center; gap: 6px; font-size: 0.8667rem; color: var(--muted); }
+.stat-value { font-size: 1.75rem; font-weight: 600; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.stat-value small { font-size: 0.9375rem; font-weight: 400; color: var(--muted); }
+.stat .bar { margin-top: 8px; }
+.bar { display: flex; gap: 2px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.bar .pass { background: var(--pass); }
+.bar .fail { background: var(--fail); }
+.bar .error { background: var(--error); }
+.tag-block { margin-top: 12px; padding: 14px 8px 8px; }
+.tag-block h3 { padding: 0 8px 6px; }
+.tags { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 2px 20px; }
+.tag-row { display: grid; grid-template-columns: minmax(0, 1fr) 64px 4.6em; gap: 12px; align-items: center; width: 100%; padding: 5px 8px; border: 0; border-radius: 6px; background: none; text-align: left; transition: background-color 0.12s; }
+.tag-row:hover { background: var(--sunken); }
+.tag-row[aria-pressed="true"] { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+.tag-row .count { margin: 0; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); white-space: nowrap; }
+
+/* Controls */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 0; background: var(--bg); }
+.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--control); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; padding: 6px 12px; transition: background-color 0.12s; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button:hover { background: var(--sunken); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; box-shadow: inset 0 -2px 0 var(--accent); }
+.seg button:focus-visible, .row-head:focus-visible { outline-offset: -2px; }
+.seg .n { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.controls select, .controls input { height: 36px; border: 1px solid var(--control); border-radius: 8px; background: var(--surface); padding: 0 10px; }
+.controls select { max-width: 100%; }
+.controls input { flex: 1 1 200px; min-width: 0; }
+.controls input::placeholder { color: var(--muted); opacity: 1; }
+.count { margin-left: auto; color: var(--muted); font-size: 0.8667rem; font-variant-numeric: tabular-nums; }
+.empty { padding: 40px 16px; text-align: center; }
+.empty p { margin-bottom: 12px; }
+
+/* Scenario rows */
+.list { overflow: hidden; }
+.row { scroll-margin-top: 12px; }
+.row:not([hidden]) ~ .row { border-top: 1px solid var(--line); }
+.row-head { display: grid; grid-template-columns: 5.4em minmax(0, 1fr) minmax(0, auto) auto 16px; grid-template-areas: "status main tags nums chevron"; gap: 4px 16px; align-items: center; width: 100%; padding: 12px 16px; border: 0; background: none; text-align: left; transition: background-color 0.12s; }
+.row-head:hover, .row-head[aria-expanded="true"] { background: var(--sunken); }
+.row.fail .row-head { box-shadow: inset 3px 0 0 var(--fail); }
+.row.error .row-head { box-shadow: inset 3px 0 0 var(--error); }
+.row-head > .status { grid-area: status; }
+.row-main { grid-area: main; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+.row-id { font-weight: 600; }
+.row-title { flex-basis: 100%; color: var(--muted); }
+.row-tags { grid-area: tags; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; max-width: 300px; }
+.row-tags:empty { display: none; }
+.row-nums { grid-area: nums; display: flex; gap: 14px; justify-content: flex-end; min-width: 3.2em; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row-head > .icon { grid-area: chevron; color: var(--muted); transition: transform 0.12s; }
+.row-head[aria-expanded="true"] > .icon { transform: rotate(90deg); }
+.chip, .badge, .kind { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+.badge { border-color: var(--control); color: var(--text); font-family: var(--sans); }
+.kind { border-radius: 4px; padding: 0 5px; margin-left: 8px; font-family: var(--mono); }
+.status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.8667rem; font-weight: 600; white-space: nowrap; }
+.status.pass { color: var(--pass); }
+.status.fail { color: var(--fail); }
+.status.error { color: var(--error); }
+.status.skip { color: var(--skip); }
+
+/* Expanded scenario */
+.detail { display: grid; gap: 18px; padding: 16px 16px 24px; border-top: 1px solid var(--line); }
+.detail > *, .attempt > *, .turn-grid > * { min-width: 0; }
+.why { border-left: 3px solid var(--accent); padding-left: 12px; }
+.why .label { display: block; }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 4px 20px; color: var(--muted); font-size: 0.8667rem; }
+.attempt { display: grid; gap: 20px; }
+.callout { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.callout.error { border-color: transparent; background: var(--error-soft); }
+.callout pre { margin-top: 6px; }
+pre { white-space: pre-wrap; }
+.turn { display: grid; gap: 8px; }
+.turn-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 14px 28px; align-items: start; }
+.talk { display: grid; gap: 8px; }
+.msg { border: 1px solid transparent; border-radius: 8px; padding: 9px 12px; }
+.msg.user { background: var(--sunken); }
+.msg.agent { border-color: var(--line); }
+.msg .label { display: block; margin-bottom: 2px; }
+.msg p { white-space: pre-wrap; }
+.tools { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+.tools .label { flex-basis: 100%; }
+.tool { border: 1px solid var(--line); border-radius: 6px; font-size: 0.8667rem; }
+.tool[open] { flex-basis: 100%; }
+.tool summary { padding: 2px 8px; border-radius: 6px; font-family: var(--mono); cursor: pointer; }
+.tool pre { padding: 8px 10px; border-top: 1px solid var(--line); }
+.checks { display: grid; gap: 12px; }
+.check { display: grid; grid-template-columns: 5.4em minmax(0, 1fr); gap: 12px; align-items: baseline; }
+.check-name { font-weight: 500; }
+.check-detail, .check dl { margin-top: 3px; font-size: 0.8667rem; }
+.check dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; }
+.check dt { color: var(--muted); }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.8667rem; }
+
+@media (min-width: 900px) {
+  .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 720px) {
+  .controls { position: sticky; top: 0; z-index: 1; }
+  .row { scroll-margin-top: 72px; }
+}
+@media (max-width: 719px) {
+  .page { padding: 16px 16px 56px; }
+  .verdict-head { padding: 20px; gap: 14px; }
+  .verdict-head .icon { width: 36px; height: 36px; }
+  .meta { padding: 16px 20px; gap: 14px 28px; }
+  .row-head { grid-template-columns: minmax(0, 1fr) auto 16px; grid-template-areas: "status nums chevron" "main main main" "tags tags tags"; padding: 12px; }
+  .row-tags { justify-content: flex-start; max-width: none; }
+  .detail { padding: 14px 12px 20px; }
+  .turn-grid { grid-template-columns: minmax(0, 1fr); }
+  .count { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<svg class="defs" aria-hidden="true">
+  <symbol id="i-pass" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M5.2 8.3l2 2 3.7-4.3"/></symbol>
+  <symbol id="i-fail" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25"/><path d="M5.8 5.8l4.4 4.4M10.2 5.8l-4.4 4.4"/></symbol>
+  <symbol id="i-error" viewBox="0 0 16 16"><path d="M8 2.2l6.4 11.2H1.6z"/><path d="M8 6.6v3M8 11.6v.01"/></symbol>
+  <symbol id="i-skip" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.25" stroke-dasharray="2.2 2.2"/><path d="M5.5 8h5"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 16 16"><path d="M6 3.5L10.5 8 6 12.5"/></symbol>
+</svg>
+<div class="page">
+  <header class="masthead">
+    <span class="brand">roadtest <span>report</span></span>
+    <button id="theme" class="quiet" type="button">Theme</button>
+  </header>
+  <main>
+    <noscript><p>This report needs JavaScript to show the run.</p></noscript>
+    <section id="verdict" class="verdict card"></section>
+
+    <section aria-labelledby="summary-title">
+      <h2 id="summary-title">Summary</h2>
+      <div id="stats" class="stats"></div>
+      <div id="tag-block" class="tag-block card">
+        <h3 class="label">By tag <span class="sr">(select a tag to filter the scenarios)</span></h3>
+        <ul id="tags" class="tags"></ul>
+      </div>
+    </section>
+
+    <section aria-labelledby="scenarios-title">
+      <h2 id="scenarios-title">Scenarios</h2>
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Filter by status">
+          <button type="button" data-status="all">All <span class="n"></span></button>
+          <button type="button" data-status="bad">Not passing <span class="n"></span></button>
+          <button type="button" data-status="pass">Passed <span class="n"></span></button>
+        </div>
+        <label class="sr" for="tag">Filter by tag</label>
+        <select id="tag"><option value="">All tags</option></select>
+        <label class="sr" for="search">Search id, title and tags</label>
+        <input id="search" type="search" placeholder="Search id, title or tag" autocomplete="off" spellcheck="false">
+        <span id="count" class="count" role="status"></span>
+      </div>
+      <ol id="list" class="list card"></ol>
+      <div id="empty" class="empty card" hidden>
+        <p id="empty-text">No scenarios match these filters.</p>
+        <button id="clear" class="quiet" type="button">Clear filters</button>
+      </div>
+    </section>
+  </main>
+  <footer id="footer"></footer>
+</div>
+
+<script id="run" type="application/json">__ROADTEST_RUN__</script>
+<script>
+"use strict";
+const SVG_NS = "http://www.w3.org/2000/svg";
+const WORDS = { pass: "Passed", fail: "Failed", error: "Error", skip: "Skipped" };
+const THEME_KEY = "roadtest-theme";
+const $ = (id) => document.getElementById(id);
+
+// Every piece of run data reaches the page through this helper as a text node or an
+// attribute value. Nothing in this file parses HTML, so agent replies cannot inject markup.
+function h(tag, props, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(props || {})) {
+    if (value == null || value === false) continue;
+    if (key === "text") node.textContent = value;
+    else if (key === "class") node.className = value;
+    else if (key === "onclick") node.addEventListener("click", value);
+    else node.setAttribute(key, value === true ? "" : value);
+  }
+  node.append(...children.flat().filter((child) => child != null && child !== false && child !== ""));
+  return node;
+}
+
+function icon(name) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", "icon");
+  svg.setAttribute("aria-hidden", "true");
+  const use = document.createElementNS(SVG_NS, "use");
+  use.setAttribute("href", "#i-" + name);
+  svg.append(use);
+  return svg;
+}
+
+// An unknown status is shown as an error rather than trusted as a class name.
+const known = (status) => (WORDS[status] ? status : "error");
+const statusBadge = (status, word) =>
+  h("span", { class: "status " + known(status) }, icon(known(status)), h("span", { text: word || WORDS[known(status)] }));
+const plural = (count, word) => `${count} ${word}${count === 1 ? "" : "s"}`;
+const tokens = (count) => (count >= 1000 ? (count / 1000).toFixed(1) + "k" : String(count));
+
+function duration(value) {
+  if (typeof value !== "number") return "";
+  if (value < 60) return value.toFixed(1) + "s";
+  const whole = Math.round(value);
+  return `${Math.floor(whole / 60)}m ${String(whole % 60).padStart(2, "0")}s`;
+}
+
+// Pass, fail and error shares of everything that ran. Decorative: the numbers sit next to it.
+function bar(counts) {
+  const track = h("span", { class: "bar", "aria-hidden": "true" });
+  for (const [key, count] of [["pass", counts.passed], ["fail", counts.failed], ["error", counts.errors]]) {
+    if (!count) continue;
+    const part = h("span", { class: key });
+    part.style.flexGrow = count;
+    track.append(part);
+  }
+  return track;
+}
+
+/* ---------- Top of page ---------- */
+
+function renderVerdict(run) {
+  const { gate, watch } = run.totals;
+  const state = run.ok ? "pass" : "fail";
+  let line = "No gate scenarios ran.";
+  if (gate.total && run.ok) line = `${gate.passed} of ${plural(gate.total, "gate scenario")} passed.`;
+  if (gate.total && !run.ok) line = `${gate.failed + gate.errors} of ${plural(gate.total, "gate scenario")} did not pass.`;
+  const watchBad = watch.failed + watch.errors;
+  if (watchBad) line += ` ${plural(watchBad, "watch scenario")} did not pass (tracked, does not gate).`;
+
+  const started = new Date(run.started);
+  const when = isNaN(started)
+    ? String(run.started || "")
+    : started.toLocaleString(undefined, { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZoneName: "short" });
+  const agent = run.agent || {};
+  const facts = [
+    ["Target", run.target],
+    ["Run", run.id, "mono"],
+    ["Started", when],
+    ["Duration", duration(run.seconds)],
+    ["Judge", run.judge_enabled ? (run.models || {}).judge : "Off (code checks only)"],
+    run.repeat > 1 && ["Repeat", `${run.repeat} attempts per scenario`],
+    ["Agent", [agent.type, agent.url || agent.entry || agent.run].filter(Boolean).join(" · "), "mono"],
+  ];
+  const section = $("verdict");
+  section.classList.add(state);
+  section.append(
+    h("div", { class: "verdict-head" }, icon(state), h("div", null, h("h1", { text: run.ok ? "Gate passed" : "Gate failed" }), h("p", { text: line }))),
+    h("dl", { class: "meta" }, facts.filter((fact) => fact && fact[1]).map(([name, value, style]) =>
+      h("div", null, h("dt", { text: name }), h("dd", { class: style, text: value })))),
+  );
+  document.title = `${run.ok ? "Gate passed" : "Gate failed"} · ${run.target || "run"} · roadtest`;
+}
+
+function renderStats(run) {
+  const { all, gate, watch } = run.totals;
+  const tier = (name, note, counts) =>
+    h("div", { class: "stat card" },
+      h("div", { class: "stat-label", text: `${name} · ${note}` }),
+      h("div", { class: "stat-value" }, String(counts.passed), h("small", { text: ` / ${counts.total} passed` })),
+      bar(counts));
+  const tally = (name, status, count, note) =>
+    h("div", { class: "stat card" },
+      h("div", { class: "stat-label" }, icon(status), name),
+      h("div", { class: "stat-value", text: String(count) }),
+      h("div", { class: "small muted", text: note }));
+  $("stats").append(
+    tier("Gate", "must pass", gate),
+    tier("Watch", "tracked only", watch),
+    tally("Errors", "error", all.errors, "the agent or a model did not answer"),
+    tally("Skipped", "skip", all.skipped, "not run"),
+  );
+}
+
+function renderFooter(run) {
+  const usage = Object.entries(run.usage || {}).map(([model, use]) =>
+    `${model}: ${plural(use.calls, "call")}, ${tokens(use.input_tokens)} tokens in, ${tokens(use.output_tokens)} out`);
+  $("footer").append(h("p", { text: [`roadtest ${run.roadtest || ""}`.trim(), ...usage].join(" · ") }));
+}
+
+/* ---------- Scenario list ---------- */
+
+const filters = { status: "all", tag: "", query: "" };
+const entries = []; // one per scenario: { scenario, row, head, panel, built, haystack }
+const tagButtons = new Map();
+const statusButtons = [...document.querySelectorAll("[data-status]")];
+const notPassing = (status) => status === "fail" || status === "error";
+
+function buildRow(run, scenario, index) {
+  const attempts = scenario.attempts || [];
+  const tags = scenario.tags || [];
+  const status = known(scenario.status);
+  const panel = h("div", { class: "detail", id: "detail-" + index, hidden: true });
+  const head = h("button", { class: "row-head", type: "button", "aria-expanded": "false", "aria-controls": panel.id },
+    statusBadge(status),
+    h("span", { class: "row-main" },
+      h("span", { class: "row-id mono", text: scenario.id }),
+      scenario.tier === "watch" && h("span", { class: "badge", title: "Tracked only: does not fail the gate", text: "watch" }),
+      h("span", { class: "row-title", text: scenario.title })),
+    h("span", { class: "row-tags" }, tags.map((tag) => h("span", { class: "chip mono", text: tag }))),
+    h("span", { class: "row-nums mono" },
+      (run.repeat > 1 || attempts.length > 1) && h("span", { text: `${scenario.passed_attempts}/${attempts.length} passed` }),
+      h("span", { text: duration(scenario.seconds) })),
+    icon("chevron"));
+  const entry = {
+    scenario, head, panel, built: false,
+    row: h("li", { class: "row " + status }, head, panel),
+    haystack: [scenario.id, scenario.title, ...tags].join(" ").toLowerCase(),
+  };
+  head.addEventListener("click", () => setOpen(entry, panel.hidden));
+  return entry;
+}
+
+// The detail of a scenario is built the first time it is opened, so long runs stay light.
+function setOpen(entry, open) {
+  if (open && !entry.built) {
+    entry.panel.append(...buildDetail(entry.scenario));
+    entry.built = true;
+  }
+  entry.panel.hidden = !open;
+  entry.head.setAttribute("aria-expanded", String(open));
+}
+
+function buildDetail(scenario) {
+  const attempts = scenario.attempts || [];
+  const body = h("div", { class: "attempt" });
+  const tabs = attempts.map((attempt, index) =>
+    h("button", { type: "button", "aria-pressed": "false", onclick: () => show(index) },
+      h("span", { class: "status " + known(attempt.status) }, icon(known(attempt.status))),
+      `Attempt ${index + 1}`,
+      h("span", { class: "sr", text: WORDS[known(attempt.status)] }),
+      h("span", { class: "n", text: duration(attempt.seconds) })));
+  function show(index) {
+    tabs.forEach((tab, at) => tab.setAttribute("aria-pressed", String(at === index)));
+    body.replaceChildren(...buildAttempt(attempts[index]));
+  }
+  // Open on the first attempt that did not pass: that is the one the reader came for.
+  if (attempts.length) show(Math.max(0, attempts.findIndex((attempt) => attempt.status !== "pass")));
+  const target = runTarget && runTarget !== "default" ? ` --target ${runTarget}` : "";
+  return [
+    scenario.why && h("p", { class: "why" }, h("span", { class: "label", text: "Why it matters" }), scenario.why),
+    h("p", { class: "detail-meta" },
+      scenario.file && h("span", { class: "mono", text: scenario.file }),
+      h("span", null, "Run again: ", h("code", { text: `roadtest run ${scenario.id}${target}` })),
+      h("a", { href: "#" + encodeURIComponent(scenario.id), text: "Link to this scenario" })),
+    attempts.length > 1 && h("div", { class: "seg", role: "group", "aria-label": "Attempts" }, tabs),
+    body,
+  ].filter(Boolean);
+}
+
+function buildAttempt(attempt) {
+  const turns = attempt.turns || [];
+  const checks = attempt.checks || [];
+  const nodes = [];
+  if (attempt.error) {
+    nodes.push(h("div", { class: "callout error" },
+      statusBadge("error"),
+      h("p", { class: "small", text: "The agent or a model call failed, so this attempt could not be graded." }),
+      h("pre", { text: attempt.error })));
+  }
+  if (attempt.note) nodes.push(h("p", { class: "callout", text: attempt.note }));
+  turns.forEach((turn, index) => nodes.push(buildTurn(turn, index)));
+  if (checks.length) nodes.push(h("div", { class: "turn" }, h("h3", { class: "label", text: "Whole conversation" }), checkList(checks)));
+  if (!nodes.length) nodes.push(h("p", { class: "muted", text: "Nothing was recorded for this attempt." }));
+  return nodes;
+}
+
+function buildTurn(turn, index) {
+  const calls = turn.tool_calls;
+  const checks = turn.checks || [];
+  let tools;
+  if (calls == null) tools = h("p", { class: "tools small muted", text: "This agent does not report tool calls." });
+  else if (!calls.length) tools = h("p", { class: "tools small muted", text: "No tool calls." });
+  else tools = h("div", { class: "tools" }, h("span", { class: "label", text: "Tool calls" }), calls.map(toolCall));
+  const message = (kind, who, text, extra) =>
+    h("div", { class: "msg " + kind },
+      h("span", { class: "label", text: who }),
+      text ? h("p", { text }) : h("p", { class: "muted", text: "(empty)" }),
+      extra);
+  return h("div", { class: "turn" },
+    h("h3", { class: "label", text: `Turn ${index + 1} · ${duration(turn.seconds)}` }),
+    h("div", { class: "turn-grid" },
+      h("div", { class: "talk" }, message("user", "User", turn.user), message("agent", "Agent", turn.reply, tools)),
+      checks.length ? checkList(checks) : h("p", { class: "small muted", text: "No checks on this turn." })));
+}
+
+// Arguments stay folded until asked for: the tool name is usually what the reader needs.
+function toolCall(call) {
+  const args = typeof call.arguments === "string" ? call.arguments : JSON.stringify(call.arguments ?? {}, null, 2);
+  return h("details", { class: "tool" }, h("summary", { text: call.name }), h("pre", { text: args }));
+}
+
+function checkList(checks) {
+  return h("ul", { class: "checks" }, checks.map((check) => {
+    const judged = check.kind === "judge";
+    return h("li", { class: "check" },
+      statusBadge(check.status),
+      h("div", null,
+        h("span", { class: "check-name", text: check.name }),
+        h("span", { class: "kind", text: check.kind }),
+        judged
+          ? h("dl", null,
+              check.criterion && [h("dt", { text: "Criterion" }), h("dd", { text: check.criterion })],
+              check.detail && [h("dt", { text: "Reasoning" }), h("dd", { text: check.detail })])
+          : check.detail && h("p", { class: "check-detail", text: check.detail })));
+  }));
+}
+
+/* ---------- Filters, deep links, theme ---------- */
+
+function applyFilters(change) {
+  Object.assign(filters, change);
+  const terms = filters.query.toLowerCase().split(/\s+/).filter(Boolean);
+  let shown = 0;
+  for (const entry of entries) {
+    const { status, tags = [] } = entry.scenario;
+    const visible =
+      (filters.status === "all" || (filters.status === "pass" ? status === "pass" : notPassing(status))) &&
+      (!filters.tag || tags.includes(filters.tag)) &&
+      terms.every((term) => entry.haystack.includes(term));
+    entry.row.hidden = !visible;
+    shown += visible;
+  }
+  for (const button of statusButtons) button.setAttribute("aria-pressed", String(button.dataset.status === filters.status));
+  for (const [tag, button] of tagButtons) button.setAttribute("aria-pressed", String(tag === filters.tag));
+  $("tag").value = filters.tag;
+  if ($("search").value !== filters.query) $("search").value = filters.query;
+  $("count").textContent = shown === entries.length ? plural(shown, "scenario") : `${shown} of ${plural(entries.length, "scenario")}`;
+  $("list").hidden = !shown;
+  $("empty").hidden = shown > 0;
+}
+
+function renderTags(run) {
+  const tags = Object.entries(run.tags || {});
+  $("tag-block").hidden = !tags.length;
+  $("tag").hidden = !tags.length;
+  for (const [tag, counts] of tags) {
+    const label = `${tag}: ${counts.passed} of ${counts.total} passed, ${counts.failed} failed, ${plural(counts.errors, "error")}, ${counts.skipped} skipped`;
+    const button = h("button", { class: "tag-row", type: "button", "aria-pressed": "false", "aria-label": label, title: label,
+      onclick: () => applyFilters({ tag: filters.tag === tag ? "" : tag }) },
+      h("span", { class: "mono", text: tag }), bar(counts), h("span", { class: "count", text: `${counts.passed}/${counts.total}` }));
+    tagButtons.set(tag, button);
+    $("tags").append(h("li", null, button));
+    $("tag").append(h("option", { value: tag, text: tag }));
+  }
+}
+
+// report.html#<scenario id> opens that scenario, clearing filters that would hide it.
+function openFromHash() {
+  let id = location.hash.slice(1);
+  try { id = decodeURIComponent(id); } catch (error) { /* keep the raw hash */ }
+  const entry = id && entries.find((item) => item.scenario.id === id);
+  if (!entry) return;
+  if (entry.row.hidden) applyFilters({ status: "all", tag: "", query: "" });
+  setOpen(entry, true);
+  entry.row.scrollIntoView();
+  entry.head.focus({ preventScroll: true });
+}
+
+function setUpTheme() {
+  const root = document.documentElement;
+  const system = matchMedia("(prefers-color-scheme: dark)");
+  const systemTheme = () => (system.matches ? "dark" : "light");
+  const show = (theme) => {
+    root.dataset.theme = theme;
+    $("theme").textContent = theme === "dark" ? "Light theme" : "Dark theme";
+  };
+  const saved = () => {
+    try { return localStorage.getItem(THEME_KEY); } catch (error) { return null; }
+  };
+  $("theme").addEventListener("click", () => {
+    const next = root.dataset.theme === "dark" ? "light" : "dark";
+    // Choosing what the system already uses clears the override, so the page follows the system again.
+    try {
+      if (next === systemTheme()) localStorage.removeItem(THEME_KEY);
+      else localStorage.setItem(THEME_KEY, next);
+    } catch (error) { /* the choice still applies to this page view */ }
+    show(next);
+  });
+  system.addEventListener("change", () => { if (!saved()) show(systemTheme()); });
+  show(root.dataset.theme);
+}
+
+/* ---------- Start ---------- */
+
+let runTarget = "";
+
+function start() {
+  setUpTheme();
+  let run;
+  try {
+    run = JSON.parse($("run").textContent);
+  } catch (error) {
+    $("verdict").append(h("p", { class: "empty", text: "This file holds no run data. `roadtest run` writes a filled-in report." }));
+    document.querySelectorAll("main section:not(#verdict)").forEach((section) => { section.hidden = true; });
+    return;
+  }
+  runTarget = run.target || "";
+  renderVerdict(run);
+  renderStats(run);
+  renderTags(run);
+  renderFooter(run);
+
+  // Failures and errors first, gate before watch; otherwise the order of the run.
+  const rank = (scenario) => (notPassing(scenario.status) ? 0 : scenario.status === "pass" ? 1 : 2);
+  const ordered = (run.scenarios || [])
+    .map((scenario, index) => ({ scenario, index }))
+    .sort((a, b) =>
+      rank(a.scenario) - rank(b.scenario) ||
+      (a.scenario.tier === "watch") - (b.scenario.tier === "watch") ||
+      (a.scenario.status === "error") - (b.scenario.status === "error") ||
+      a.index - b.index);
+  for (const { scenario, index } of ordered) entries.push(buildRow(run, scenario, index));
+  $("list").append(...entries.map((entry) => entry.row));
+
+  const counts = { all: entries.length, bad: 0, pass: 0 };
+  for (const entry of entries) {
+    if (notPassing(entry.scenario.status)) counts.bad += 1;
+    if (entry.scenario.status === "pass") counts.pass += 1;
+  }
+  for (const button of statusButtons) {
+    button.querySelector(".n").textContent = counts[button.dataset.status];
+    button.addEventListener("click", () => applyFilters({ status: button.dataset.status }));
+  }
+  $("tag").addEventListener("change", (event) => applyFilters({ tag: event.target.value }));
+  $("search").addEventListener("input", (event) => applyFilters({ query: event.target.value }));
+  $("clear").addEventListener("click", () => applyFilters({ status: "all", tag: "", query: "" }));
+  if (!entries.length) {
+    $("empty-text").textContent = "This run has no scenarios.";
+    $("clear").hidden = true;
+  }
+  applyFilters({});
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
+}
+
+start();
+</script>
+</body>
+</html>

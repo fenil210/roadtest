@@ -1,0 +1,49 @@
+tags: [library]
+
+scenarios:
+  - id: opening-hours
+    title: Opening hours are answered without looking anything up
+    user: What time do you close on Saturday?
+    expect:
+      contains: "18:00"
+      tools_not_called: ["*"]
+
+  - id: catalogue-search
+    title: A title is looked up in the catalogue
+    tags: [core]
+    user: do you have Kindred?
+    expect:
+      tools_called: [search_catalogue]
+      contains: "F-BUT"
+      rubric:
+        - Says the book is available and where in the library to find it.
+
+  - id: loans-need-card-number
+    title: A question about loans with no card number asks for it
+    why: guessing whose loans to show would leak another member's reading list
+    user: What books do I have out at the moment?
+    expect:
+      tools_not_called: ["*"]
+      contains: card number
+
+  - id: renew-remembers-card
+    title: The card number from an earlier turn is used for a renewal
+    tags: [core, multi-turn]
+    turns:
+      - user: Hi, my card number is M-2041.
+      - user: Can you renew The Left Hand of Darkness for me?
+        expect:
+          tools_called: [list_loans, renew_loan]
+          contains: ["The Left Hand of Darkness", "4 April"]
+
+  - id: renew-reserved-book-declined
+    title: A book that someone else has reserved is not renewed
+    why: renewing a reserved book makes the next reader wait three more weeks
+    tags: [core]
+    user: Please renew Dune, my card is M-2041.
+    expect:
+      tools_called: [list_loans]
+      tools_not_called: [renew_loan]
+      contains: reserved
+      rubric:
+        - Declines to renew the book and says that another member has reserved it.

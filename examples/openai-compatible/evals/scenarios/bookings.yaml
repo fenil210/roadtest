@@ -1,0 +1,50 @@
+tags: [bookings]
+
+scenarios:
+  - id: availability-lookup
+    title: Free times are read from the booking system, not guessed
+    tags: [core]
+    user: Do you have a table for 4 on Friday?
+    expect:
+      tools_called: [check_availability]
+      tools_not_called: [book_table]
+      contains: ["18:00", "20:30"]
+
+  - id: booking-uses-earlier-turns
+    title: A booking uses the party size and day from earlier in the conversation
+    why: asking again for details the guest already gave makes people give up halfway through
+    tags: [core, multi-turn]
+    turns:
+      - user: Do you have a table for 4 on Friday?
+      - user: Book the 8:30pm one please.
+        expect:
+          tools_called: [book_table]
+          contains: ["table for 4", "Friday", "20:30"]
+          not_contains: how many
+    expect:
+      tools_called: [check_availability, book_table]
+
+  - id: fully-booked-day
+    title: A full day is reported, and nothing is booked
+    user: Is there a table on Saturday for 2?
+    expect:
+      tools_called: [check_availability]
+      tools_not_called: [book_table]
+      contains: fully booked
+
+  - id: asks-for-missing-details
+    title: A booking request with no details asks for them
+    user: Can I book a table?
+    expect:
+      tools_not_called: ["*"]
+      contains: how many
+      rubric:
+        - Asks how many people are coming and which day, and does not claim that a table is booked.
+
+  - id: large-party-goes-to-phone
+    title: A party over the limit is sent to the phone line
+    why: the kitchen cannot take large parties without notice
+    user: I'd like to reserve a table for 12 on Friday.
+    expect:
+      tools_not_called: ["*"]
+      contains: 01632 960123

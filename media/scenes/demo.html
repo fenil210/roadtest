@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>roadtest demo</title>
+<link rel="stylesheet" href="lib/base.css">
+<style>
+  .window { inset: 36px; }
+  .terminal { --term-size: 21px; --term-line: 30px; }
+</style>
+</head>
+<body>
+<div class="backdrop"></div>
+<div class="window">
+  <div class="bar"><i></i><i></i><i></i><span>roadtest demo</span></div>
+  <div class="terminal" id="terminal"></div>
+</div>
+<script src="../captures/demo.js"></script>
+<script type="module">
+  import { createTerminal } from "./lib/terminal.js";
+  const terminal = createTerminal(document.getElementById("terminal"), window.CAPTURES.demo, { start: 0.6 });
+  window.DURATION = terminal.end + 4.5;   // hold the result long enough to read
+  window.seek = (t) => terminal.seek(t);
+  window.seek(Number(new URLSearchParams(location.search).get("t") ?? window.DURATION));
+</script>
+</body>
+</html>

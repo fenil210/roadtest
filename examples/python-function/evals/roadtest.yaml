@@ -1,0 +1,6 @@
+# The clinic front desk in ../agent.py. There is no server to start: roadtest imports the adapter.
+version: 1
+
+agent:
+  type: python
+  entry: adapter.py:call     # a file next to this one; the function is called once per turn

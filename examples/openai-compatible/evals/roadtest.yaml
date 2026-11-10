@@ -1,0 +1,14 @@
+# The bistro reservations agent in ../agent.py. Start it first: python3 agent.py
+version: 1
+
+agent:
+  type: http
+  url: http://127.0.0.1:18803/v1/chat/completions
+  # headers:
+  #   Authorization: "Bearer ${AGENT_API_KEY}"   # a real endpoint usually wants a key
+  body:
+    model: bistro-agent
+    messages: "{{messages}}"                      # the whole conversation, every turn: the endpoint keeps no state
+  response:
+    text: choices[0].message.content
+    tool_calls: "choices[0].message.tool_calls[*]"  # objects: the name is read from function.name, the arguments from function.arguments

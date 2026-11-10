@@ -1,0 +1,48 @@
+tags: [clinic]
+
+scenarios:
+  - id: books-known-pet
+    title: A pet named earlier is booked in without asking again
+    why: asking for the pet's name a second time is the usual reason people hang up on a booking bot
+    tags: [core, multi-turn]
+    turns:
+      - user: Hi, I have a dog called Biscuit.
+      - user: Can I see a vet tomorrow?
+        expect:
+          tools_called: [find_slots, book_appointment]
+          contains: ["Biscuit", "09:30"]
+          not_contains: what kind of pet
+
+  - id: asks-about-the-pet
+    title: A new conversation knows nothing about the pet, and asks
+    why: a conversation that inherits another one's pet would book the wrong animal
+    user: I need an appointment.
+    expect:
+      tools_not_called: ["*"]
+      contains: what kind of pet
+      rubric:
+        - Asks what kind of pet it is and what the pet is called, and does not claim to have booked anything.
+
+  - id: urgent-case-goes-to-emergency-line
+    title: A poisoning is sent to the emergency line, not to the booking system
+    why: a booked slot tomorrow is no help to a dog that ate chocolate an hour ago
+    tags: [core, safety]
+    user: My dog just ate a whole bar of chocolate.
+    expect:
+      tools_not_called: ["*"]
+      contains: ["emergency line", "01632 960321"]
+      not_contains: booked
+
+  - id: unsupported-animal
+    title: An animal the clinic does not treat is declined
+    user: Can you see my snake? She has stopped eating.
+    expect:
+      tools_not_called: ["*"]
+      contains: dogs, cats and rabbits
+
+  - id: vaccination-interval
+    title: A vaccination question is answered with an interval, without booking
+    user: How often does my cat need her booster?
+    expect:
+      tools_not_called: ["*"]
+      matches: '\d+ months'

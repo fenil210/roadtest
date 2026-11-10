@@ -1,0 +1,6 @@
+# The tool hire counter in ../agent.py. roadtest starts it for every turn, so there is nothing to run first.
+version: 1
+
+agent:
+  type: command
+  run: [python3, agent.py]   # the turn arrives as JSON on stdin; the answer is printed as JSON on stdout

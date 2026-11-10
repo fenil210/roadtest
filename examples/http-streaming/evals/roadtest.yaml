@@ -1,0 +1,14 @@
+# The train times agent in ../agent.py. Start it first: python3 agent.py
+version: 1
+
+agent:
+  type: http
+  url: http://127.0.0.1:18802/chat/stream
+  body:
+    message: "{{message}}"
+    conversation_id: "{{session_id}}"   # empty on the first turn, so the key is left out
+  response:
+    format: sse
+    text: delta                         # the field that holds each piece of the answer
+    tool_calls: tool                    # read from the events that have it
+    session_id: conversation_id         # the server issues the id; roadtest sends it back from turn two

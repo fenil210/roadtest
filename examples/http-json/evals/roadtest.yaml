@@ -1,0 +1,12 @@
+# The library desk agent in ../agent.py. Start it first: python3 agent.py
+version: 1
+
+agent:
+  type: http
+  url: http://127.0.0.1:18801/chat
+  body:
+    question: "{{message}}"
+    conversation_id: "{{session_id}}"   # roadtest makes a fresh id for every scenario run
+  response:
+    text: data.answer
+    tool_calls: "data.steps[*]"         # objects: the name is read from `tool`, the arguments from `input`

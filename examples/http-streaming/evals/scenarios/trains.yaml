@@ -1,0 +1,45 @@
+tags: [trains]
+
+scenarios:
+  - id: next-train
+    title: The next departure is looked up and given with its platform
+    tags: [core]
+    user: When is the next train from Leeds to York?
+    expect:
+      tools_called: [find_departures]
+      contains: ["09:15", "platform 4"]
+
+  - id: asks-for-route
+    title: A question with no route asks where the user is going
+    why: guessing a route sends someone to the wrong platform
+    user: When is the next train?
+    expect:
+      tools_not_called: ["*"]
+      not_contains: platform
+      rubric:
+        - Asks where the user is travelling from and to.
+
+  - id: route-remembered
+    title: The route from an earlier turn is used for a follow-up
+    tags: [core, multi-turn]
+    turns:
+      - user: I'm going from Leeds to Manchester today.
+      - user: Is it on time?
+        expect:
+          tools_called: [check_disruptions]
+          contains: ["Leeds to Manchester", "10 minutes late"]
+
+  - id: unknown-station
+    title: A station that is not on the line is not given a departure
+    user: When is the next train from Leeds to Atlantis?
+    expect:
+      tools_not_called: ["*"]
+      contains: Atlantis
+      not_contains: platform
+
+  - id: out-of-scope
+    title: Requests that are not about trains are declined
+    user: Can you book me a hotel in York?
+    expect:
+      tools_not_called: ["*"]
+      contains: train times

@@ -1,0 +1,12 @@
+{
+  "name": "roadtest",
+  "description": "roadtest: scenario-based evals for any AI agent, set up and written by your coding agent.",
+  "owner": { "name": "Fenil Ramoliya" },
+  "plugins": [
+    {
+      "name": "roadtest",
+      "source": "./",
+      "description": "Set up, write and triage evals for an AI agent with roadtest."
+    }
+  ]
+}
