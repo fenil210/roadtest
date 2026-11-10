@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from ..config import ModelRef
-from .client import LLM
 from ..scenarios import Simulate
+from .client import LLM
 
 INSTRUCTIONS = """You play a user who is talking to an AI agent, so that the agent can be tested.
 

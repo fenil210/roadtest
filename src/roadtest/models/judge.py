@@ -8,8 +8,8 @@ from ..adapters import ToolCall
 from ..checks import ERROR, FAIL, PASS, CheckResult
 from ..config import ModelRef
 from ..errors import ModelError
-from .client import LLM
 from ..scenarios import Criterion
+from .client import LLM
 
 MAX_MESSAGE_CHARS = 24_000
 
