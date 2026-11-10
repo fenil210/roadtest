@@ -10,15 +10,15 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from . import __version__
-from .agents import Agent, Session, ToolCall, build_agent
+from .adapters import Agent, Session, ToolCall, build_agent
 from .checks import ERROR, FAIL, PASS, SKIP, CheckContext, CheckResult, run_code_checks, run_custom_checks
 from .config import DEFAULT_TARGET, Config
 from .errors import AgentError, ConfigError, ModelError
-from .judge import judge
-from .llm import LLM
-from .results import summarize
+from .models import LLM
+from .models.judge import judge
+from .models.simulated_user import next_user_message
+from .reports import summarize
 from .scenarios import Expect, Scenario
-from .simulate import next_user_message
 
 
 @dataclass

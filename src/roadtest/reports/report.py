@@ -14,7 +14,7 @@ from rich.table import Table
 ICONS = {"pass": "✓", "fail": "✗", "error": "!", "skip": "–"}
 STYLES = {"pass": "green", "fail": "red", "error": "yellow", "skip": "dim"}
 WORDS = {"pass": "passed", "fail": "failed", "error": "error", "skip": "skipped"}
-TEMPLATE = Path(__file__).parent / "templates" / "report.html"
+TEMPLATE = Path(__file__).parent / "report.html"
 RUN_PLACEHOLDER = "__ROADTEST_RUN__"
 
 
@@ -104,7 +104,6 @@ def print_summary(console: Console, run: dict[str, Any], folder: Path | None = N
 def markdown_summary(run: dict[str, Any]) -> str:
     """A short summary for a pull request comment or a CI job summary."""
     totals = run["totals"]
-    gate = totals["gate"]
     verdict = "✅ Gate passed" if run["ok"] else "❌ Gate failed"
     lines = [
         f"## roadtest: {verdict}",

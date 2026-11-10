@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import json
 
-from .agents import ToolCall
-from .checks import ERROR, FAIL, PASS, CheckResult
-from .config import ModelRef
-from .errors import ModelError
-from .llm import LLM
-from .scenarios import Criterion
+from ..adapters import ToolCall
+from ..checks import ERROR, FAIL, PASS, CheckResult
+from ..config import ModelRef
+from ..errors import ModelError
+from .client import LLM
+from ..scenarios import Criterion
 
 MAX_MESSAGE_CHARS = 24_000
 

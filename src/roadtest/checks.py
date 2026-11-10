@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from .agents import ToolCall, load_callable
+from .adapters import ToolCall, load_callable
 from .scenarios import Expect
 
 PASS, FAIL, ERROR, SKIP = "pass", "fail", "error", "skip"

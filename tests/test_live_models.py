@@ -16,8 +16,8 @@ import pytest
 from roadtest import ToolCall
 from roadtest.config import Config, ModelsSpec
 from roadtest.demo import agent as demo_agent
-from roadtest.judge import judge
-from roadtest.llm import LLM
+from roadtest.models import LLM
+from roadtest.models.judge import judge
 from roadtest.runner import RunOptions, run_scenarios
 from roadtest.scenarios import Criterion, load_scenarios
 

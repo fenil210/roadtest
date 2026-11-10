@@ -10,7 +10,7 @@ import pytest
 
 from roadtest.config import load_config
 from roadtest.errors import RoadtestError
-from roadtest.results import compare_runs, find_run, save_baseline, save_run
+from roadtest.reports import compare_runs, find_run, save_baseline, save_run
 
 from conftest import run_config, write_project
 

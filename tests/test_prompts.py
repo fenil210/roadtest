@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from roadtest import ToolCall, judge, simulate
+from roadtest import ToolCall
+from roadtest.models import judge, simulated_user
 from roadtest.scenarios import Simulate
 
 CONVERSATION = [
@@ -50,7 +51,7 @@ def test_the_judge_can_tell_no_tools_called_from_tool_calls_not_reported() -> No
 
 def test_the_simulated_user_sees_the_conversation_from_its_own_side() -> None:
     # If the roles were swapped the generator would answer as the agent and the conversation would never move.
-    messages = simulate.build_messages(
+    messages = simulated_user.build_messages(
         Simulate(goal="Get a refund for the broken helmet.", persona="An impatient customer."), CONVERSATION
     )
     prompt = messages[1]["content"]
@@ -62,6 +63,6 @@ def test_the_simulated_user_sees_the_conversation_from_its_own_side() -> None:
 
 
 def test_the_simulated_user_is_told_to_speak_first_when_nothing_has_been_said() -> None:
-    prompt = simulate.build_messages(Simulate(goal="Ask where order A-1003 is."), [])[1]["content"]
+    prompt = simulated_user.build_messages(Simulate(goal="Ask where order A-1003 is."), [])[1]["content"]
     assert "you speak first" in prompt
     assert "<persona>\nAn ordinary user.\n</persona>" in prompt

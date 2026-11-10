@@ -16,12 +16,21 @@ from rich.console import Console
 from rich.markup import escape
 
 from . import __version__, scaffold
-from .agents import AgentError, build_agent
+from .adapters import build_agent
 from .config import DEFAULT_TARGET, Config, load_config, load_env_file
-from .errors import ModelError, RoadtestError, ScenarioError
-from .llm import LLM
-from .report import markdown_summary, print_comparison, print_summary, result_line, write_html
-from .results import compare_runs, find_run, save_baseline, save_run
+from .errors import AgentError, ModelError, RoadtestError, ScenarioError
+from .models import LLM
+from .reports import (
+    compare_runs,
+    find_run,
+    markdown_summary,
+    print_comparison,
+    print_summary,
+    result_line,
+    save_baseline,
+    save_run,
+    write_html,
+)
 from .runner import RunOptions, run_scenarios
 from .scenarios import Scenario, load_scenarios, select
 

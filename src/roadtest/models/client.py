@@ -10,8 +10,8 @@ from typing import Any
 
 import httpx
 
-from .config import ModelRef, ModelsSpec
-from .errors import ModelError
+from ..config import ModelRef, ModelsSpec
+from ..errors import ModelError
 
 DEFAULT_BASE_URL = "https://api.openai.com/v1"
 RETRYABLE_STATUSES = {429, 500, 502, 503, 504}

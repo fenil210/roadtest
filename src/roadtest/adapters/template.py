@@ -6,7 +6,7 @@ import json
 import re
 from typing import Any
 
-from .errors import ConfigError
+from ..errors import ConfigError
 
 _PLACEHOLDER = re.compile(r"\{\{\s*([A-Za-z_][\w.]*)\s*\}\}")
 _PATH_TOKEN = re.compile(r"([^.\[\]]+)|\[(\*|-?\d+)\]")

@@ -7,7 +7,6 @@ whose agent is a small Python function.
 from __future__ import annotations
 
 from pathlib import Path
-from textwrap import dedent
 
 import pytest
 

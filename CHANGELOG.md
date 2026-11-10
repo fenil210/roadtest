@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- The package is grouped by what each part does: `adapters/` (HTTP, Python function, command),
+  `models/` (the judge and the simulated user) and `reports/` (saving, comparing and showing runs).
+  The public names `roadtest.Reply`, `Session`, `ToolCall` and `CheckContext` are unchanged.
+
 ## 0.1.1
 
 - Clearer wording in the README, the command-line help and the files `roadtest init` writes.

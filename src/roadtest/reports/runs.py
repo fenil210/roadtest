@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .config import Config
-from .errors import RoadtestError
+from ..config import Config
+from ..errors import RoadtestError
 
 RUN_FILE = "run.json"
 NOT_PASSING = ("fail", "error")

@@ -13,8 +13,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from roadtest.report import write_html  # noqa: E402
-from roadtest.results import summarize  # noqa: E402
+from roadtest.reports import summarize, write_html  # noqa: E402
 
 ILLUSTRATIVE = {
     "refund-outside-window": (

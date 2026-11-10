@@ -17,10 +17,14 @@ roadtest demo
 
 | Path | What it holds |
 | --- | --- |
-| `src/roadtest/agents.py` | The adapters: HTTP, Python function, command |
-| `src/roadtest/scenarios.py`, `config.py` | The file formats and their validation |
-| `src/roadtest/checks.py`, `judge.py`, `simulate.py` | Code checks, the judge, the simulated user |
-| `src/roadtest/runner.py`, `results.py`, `report.py` | Running, saving, comparing and showing runs |
+| `src/roadtest/cli.py` | The `roadtest` command |
+| `src/roadtest/config.py`, `scenarios.py` | The two file formats, `roadtest.yaml` and scenario files, and their validation |
+| `src/roadtest/runner.py` | Plays each scenario against the agent and builds the run record |
+| `src/roadtest/checks.py` | The code checks: text, tools, time and custom Python checks |
+| `src/roadtest/adapters/` | How roadtest reaches the agent: `http.py`, `python.py`, `command.py` |
+| `src/roadtest/models/` | The judge, the simulated user and the client they share |
+| `src/roadtest/reports/` | Saving and comparing runs, and the terminal, Markdown and HTML reports |
+| `src/roadtest/scaffold.py` | The files `roadtest init` writes |
 | `src/roadtest/demo/` | The bundled demo agent and its scenarios |
 | `skills/roadtest/` | The skill for coding assistants. Its `references/` pages are also what `roadtest guide` prints |
 | `examples/` | Small runnable projects, one per way of connecting an agent |
